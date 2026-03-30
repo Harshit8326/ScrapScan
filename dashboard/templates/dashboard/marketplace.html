@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrapScan | B2B Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .accent-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex">
+
+    <aside class="w-80 glass border-r border-slate-700 flex flex-col min-h-screen">
+        <div class="p-8">
+            <h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+                <span class="text-indigo-400">⚡</span> ScrapScan
+            </h1>
+            <p class="text-sm text-slate-400 mt-2">AI Sorting System v1.0</p>
+        </div>
+        
+        <nav class="flex-1 px-6 space-y-4 mt-4">
+            <a href="/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">📷</span> Operator View
+            </a>
+            <a href="/thread/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">🧬</span> Digital Thread
+            </a>
+            <a href="/marketplace/" class="flex items-center gap-4 p-4 rounded-xl accent-gradient text-white shadow-lg text-lg font-medium">
+                <span class="text-xl">🛒</span> B2B Marketplace
+            </a>
+            <a href="/analytics/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">📊</span> Plant Analytics
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-slate-700 space-y-4">
+            <div class="flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]"></div>
+                <span class="text-xs font-bold text-emerald-500 uppercase tracking-widest">System Online</span>
+            </div>
+            
+            <form action="{% url 'logout_view' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition font-bold text-sm border border-red-500/20">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    LOG OUT
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-12 overflow-y-auto">
+        <header class="mb-12 flex justify-between items-center">
+            <div>
+                <h2 class="text-5xl font-black tracking-tight mb-2">B2B Marketplace</h2>
+                <p class="text-slate-400 text-lg">Verified sustainable textile materials for industrial use.</p>
+            </div>
+            <button id="groupBtn" class="hidden px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold shadow-lg transition-all flex items-center gap-3">
+                <span>📦</span> Create Bulk Lot (<span id="selectedCount">0</span>)
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+            {% for item in items %}
+            <div class="glass p-8 rounded-[2.5rem] shadow-lg flex flex-col relative border border-slate-700 hover:border-indigo-500/50 transition-all group">
+                
+                <input type="checkbox" value="{{ item.id }}" class="item-checkbox absolute top-8 right-8 w-6 h-6 rounded-lg border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-500 z-20 cursor-pointer">
+                
+                <div class="h-48 rounded-2xl mb-6 overflow-hidden relative border border-slate-700 bg-slate-800">
+                    
+                    {% if item.primary_material == 'Denim' %}
+                        <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=600&auto=format&fit=crop" alt="Denim" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+                    {% elif 'Cotton' in item.primary_material %}
+                        <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format&fit=crop" alt="Cotton" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+                    {% elif item.primary_material == 'Polyester' %}
+                        <img src="https://images.unsplash.com/photo-1584346133934-a3afd2a33c4c?q=80&w=600&auto=format&fit=crop" alt="Polyester" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1551028150-64b9e398f678?q=80&w=600&auto=format&fit=crop" alt="Textile" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-500">
+                    {% endif %}
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                    
+                    <span class="absolute bottom-4 left-4 bg-indigo-500/20 backdrop-blur-md border border-indigo-500/50 text-indigo-400 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">
+                        AI Verified Scan
+                    </span>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-3xl font-black">{{ item.primary_material }}</h3>
+                    {% if item.batch_group_id %}
+                    <span class="inline-block mt-2 text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded border border-indigo-500/20">
+                        LOT: {{ item.batch_group_id }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="mt-auto pt-6 border-t border-slate-700/50 space-y-4">
+                    
+                    <div class="flex justify-between items-center bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Available</span>
+                        <span class="text-lg font-black text-indigo-300">{{ item.weight }} kg</span>
+                    </div>
+
+                    <div class="flex justify-between items-end pt-2">
+                        <div>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Total Value</p>
+                            <span class="text-3xl font-black text-white">₹{{ item.price }}</span>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'digital_twin_detail' item.item_id %}" class="block w-full text-center bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
+                        REVIEW & BUY
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const groupBtn = document.getElementById('groupBtn');
+        const selectedCount = document.getElementById('selectedCount');
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const checked = document.querySelectorAll('.item-checkbox:checked');
+                selectedCount.innerText = checked.length;
+                if (checked.length > 1) {
+                    groupBtn.classList.remove('hidden');
+                } else {
+                    groupBtn.classList.add('hidden');
+                }
+            });
+        });
+
+        groupBtn.addEventListener('click', () => {
+            const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked')).map(cb => cb.value);
+            fetch('/api/group-items/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert("Bulk Lot Created: " + data.batch_id);
+                    location.reload();
+                }
+            });
+        });
+            const inputField = document.getElementById(`buy-weight-${itemId}`);
+            const requestedWeight = parseFloat(inputField.value);
+
+            if (!requestedWeight || requestedWeight <= 0 || requestedWeight > maxWeight) {
+                alert(`Please enter a valid weight between 0.1 and ${maxWeight} kg.`);
+                return;
+            }
+
+            if (confirm(`Initialize smart contract for ${requestedWeight} kg?`)) {
+                fetch(`/api/purchase/${itemId}/`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ weight: requestedWeight })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(`Transaction Confirmed!\nBlockchain Hash: ${data.tx_hash}`);
+                        location.reload(); // Refresh to show the updated weight/price!
+                    } else {
+                        alert("Transaction Failed: " + data.message);
+                    }
+                })
+                .catch(err => console.error("Error:", err));
+            }
+        }
+    </script>
+</body>
+</html>

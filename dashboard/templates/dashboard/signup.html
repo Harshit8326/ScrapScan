@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrapScan | Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .accent-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+        
+        /* 1. Force the height and text size to be massive */
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            height: 4.5rem; /* Forces a tall input box */
+            padding: 1rem 1.5rem; 
+            border-radius: 1rem; 
+            background: rgba(15, 23, 42, 0.8) !important; 
+            border: 2px solid rgba(255, 255, 255, 0.2); 
+            color: white !important; 
+            outline: none; 
+            transition: all 0.3s; 
+            margin-top: 0.75rem; 
+            margin-bottom: 2rem;
+            font-size: 1.5rem !important; /* Huge typing text */
+            font-family: monospace;
+        }
+        input:focus { border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        label { font-size: 1.1rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.1em; }
+        .helptext { display: none; }
+        ul.errorlist { font-size: 1rem; color: #ef4444; margin-bottom: 1.5rem; list-style: none; padding: 0;}
+
+        /* 2. Overkill CSS to stop Chrome/Edge from turning autofill boxes white */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative overflow-hidden py-16">
+    
+    <div class="absolute top-[20%] right-[-5%] w-[700px] h-[700px] bg-indigo-600 rounded-full mix-blend-multiply filter blur-[150px] opacity-30"></div>
+    <div class="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-purple-600 rounded-full mix-blend-multiply filter blur-[150px] opacity-30"></div>
+
+    <div class="glass p-16 rounded-[2.5rem] shadow-2xl w-full max-w-2xl relative z-10 border-t border-l border-white/10">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-black tracking-tight flex items-center justify-center gap-4 mb-4">
+                <span class="text-indigo-400">⚡</span> ScrapScan
+            </h1>
+            <p class="text-xl text-slate-400">Create New Operator Profile</p>
+        </div>
+
+        <form method="POST" action="{% url 'signup_view' %}">
+            {% csrf_token %}
+            {{ form }}
+            
+            <button type="submit" class="w-full mt-8 py-6 accent-gradient rounded-2xl font-black text-2xl tracking-wide shadow-[0_10px_30px_rgba(99,102,241,0.4)] hover:scale-[1.02] transition-transform">
+                REGISTER PROFILE
+            </button>
+        </form>
+
+        <p class="mt-12 text-center text-lg text-slate-400">
+            Already have an account? <br>
+            <a href="{% url 'login_view' %}" class="text-indigo-400 font-bold hover:text-indigo-300 mt-2 inline-block">Return to Login</a>
+        </p>
+    </div>
+
+</body>
+</html>

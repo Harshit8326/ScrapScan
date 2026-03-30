@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrapScan | Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .accent-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex">
+
+    <aside class="w-80 glass border-r border-slate-700 flex flex-col hidden md:flex">
+        <div class="p-8">
+            <h1 class="text-3xl font-bold tracking-tight flex items-center gap-3">
+                <span class="text-indigo-400">⚡</span> ScrapScan
+            </h1>
+            <p class="text-sm text-slate-400 mt-2">AI Sorting System v1.0</p>
+        </div>
+        <nav class="flex-1 px-6 space-y-4 mt-4">
+            <a href="/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">📷</span> Operator View
+            </a>
+            <a href="/thread/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">🧬</span> Digital Thread
+            </a>
+            <a href="/marketplace/" class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800 transition text-slate-300 text-lg font-medium">
+                <span class="text-xl">🛒</span> B2B Marketplace
+            </a>
+            <a href="/analytics/" class="flex items-center gap-4 p-4 rounded-xl accent-gradient text-white shadow-lg text-lg font-medium">
+                <span class="text-xl">📊</span> Plant Analytics
+            </a>
+        </nav>
+        <div class="p-6 border-t border-slate-700 mt-auto">
+            <form action="{% url 'logout_view' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition font-bold text-sm border border-red-500/20">
+                    LOG OUT
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-12 overflow-y-auto">
+        <header class="mb-10 flex justify-between items-end">
+            <div>
+                <h2 class="text-5xl font-black tracking-tight mb-2">Operations Dashboard</h2>
+                <p class="text-xl text-slate-400">Real-time throughput and factory efficiency metrics.</p>
+            </div>
+            <a href="{% url 'export_compliance_csv' %}" class="px-6 py-4 glass hover:bg-slate-700 transition rounded-xl font-bold flex items-center gap-3 border border-indigo-500/30">
+                <span>📄</span> Export Compliance CSV
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            <div class="glass p-8 rounded-[2rem] border border-slate-700 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Total Scans Processed</p>
+                <p class="text-6xl font-black text-white">{{ total_scans }}</p>
+            </div>
+            <div class="glass p-8 rounded-[2rem] border border-slate-700 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Verified Output Weight</p>
+                <p class="text-6xl font-black text-emerald-400">{{ total_weight }} <span class="text-2xl text-slate-500">kg</span></p>
+            </div>
+            <div class="glass p-8 rounded-[2rem] border border-slate-700 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                <p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Average AI Purity</p>
+                <p class="text-6xl font-black text-purple-400">{{ avg_purity }}<span class="text-4xl">%</span></p>
+            </div>
+        </div>
+
+        <div class="glass p-10 rounded-[2.5rem] border border-slate-700 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-3">
+                <span>📈</span> Material Distribution Breakdown
+            </h3>
+            <div class="w-full h-[400px]">
+                <canvas id="materialChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const ctx = document.getElementById('materialChart').getContext('2d');
+        
+        // Grab the JSON data injected by Django
+        const materialLabels = {{ materials_json|safe }};
+        const materialCounts = {{ counts_json|safe }};
+
+        // Create the gradient for the bars
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.8)'); // Purple
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.8)'); // Indigo
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: materialLabels,
+                datasets: [{
+                    label: 'Number of Scans',
+                    data: materialCounts,
+                    backgroundColor: gradient,
+                    borderRadius: 12,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { size: 14 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#cbd5e1', font: { size: 14, weight: 'bold' } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
